@@ -9,9 +9,8 @@ import com.example.liquidacionDeEmpleado.repositories.ILiquidacionRepository;
 import com.example.liquidacionDeEmpleado.services.interfaces.ILiquidacionService;
 import com.example.liquidacionDeEmpleado.utils.Constantes;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+
 
 
 import java.util.ArrayList;
@@ -28,16 +27,15 @@ public class LiquidacionServiceImpl implements ILiquidacionService {
 
     @Override
     public int calcularRubros(int idLiquidacion) {
-        Optional<Empleado> empleado = iEmpleadoRepository.findByIdEmpleado(idLiquidacion);
         Optional<Liquidacion> liquidacion = iLiquidacionRepository.findById(idLiquidacion);
         double porciento = 0.12;
         int dosAños = Constantes.año + Constantes.año;
-        double prima = (empleado.get().getSueldoEmpleado() +
-                Constantes.auxilioTrasporte * empleado.get().getDiasLaborados()/Constantes.año);
-        double cesantias = (empleado.get().getSueldoEmpleado()
-                * empleado.get().getDiasLaborados()/Constantes.año);
-        double interesCesantia = (cesantias * porciento/empleado.get().getDiasLaborados());
-        double vacaciones = empleado.get().getSueldoEmpleado() * empleado.get().getDiasLaborados()/dosAños;
+        double prima = (liquidacion.get().getEmpleado().getSueldoEmpleado() +
+                Constantes.auxilioTrasporte * liquidacion.get().getEmpleado().getDiasLaborados()/Constantes.año);
+        double cesantias = (liquidacion.get().getEmpleado().getSueldoEmpleado()
+                * liquidacion.get().getEmpleado().getDiasLaborados()/Constantes.año);
+        double interesCesantia = (cesantias * porciento/liquidacion.get().getEmpleado().getDiasLaborados());
+        double vacaciones = liquidacion.get().getEmpleado().getSueldoEmpleado() * liquidacion.get().getEmpleado().getDiasLaborados()/dosAños;
         liquidacion.get().setPrima(prima);
         liquidacion.get().setCesantia(cesantias);
         liquidacion.get().setInteresCesantia(interesCesantia);
@@ -54,12 +52,10 @@ public class LiquidacionServiceImpl implements ILiquidacionService {
             Liquidacion liquidacion = new Liquidacion();
             liquidacion.setEmpleado(empleado.get());
             iLiquidacionRepository.save(liquidacion);
-            actualizarIdLiquidacionEmpleado(empleado.get());
     }
 
     @Override
     public List<EmpleadoLiquidacionDTO> buscarEmpleadoYSuLiquidacion() {
-        List<Empleado> empleadoList = iEmpleadoRepository.findAll();
         List<Liquidacion> liquidacionList = iLiquidacionRepository.findAll();
         List<EmpleadoLiquidacionDTO> empleadoLiquidacionDTOList = new ArrayList<>();
         if(!liquidacionList.isEmpty()){
@@ -84,11 +80,5 @@ public class LiquidacionServiceImpl implements ILiquidacionService {
         List<Liquidacion> liquidacionList = iLiquidacionRepository.buscarTercerEmpleado();
         return liquidacionList;
     }
-
-    private void actualizarIdLiquidacionEmpleado(Empleado empleado){
-
-        iEmpleadoRepository.save(empleado);
-    }
-
 
 }

@@ -1,18 +1,18 @@
 package com.example.liquidacionDeEmpleado.services.implementacion;
 
 import com.example.liquidacionDeEmpleado.dto.EmpleadoDTO;
-import com.example.liquidacionDeEmpleado.dto.EmpleadoLiquidacionDTO;
 import com.example.liquidacionDeEmpleado.models.Empleado;
 import com.example.liquidacionDeEmpleado.repositories.IEmpleadoRepository;
 import com.example.liquidacionDeEmpleado.services.interfaces.IEmpleadoService;
 import com.example.liquidacionDeEmpleado.services.interfaces.ILiquidacionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EmpleadoServeceImpl implements IEmpleadoService {
@@ -54,12 +54,26 @@ public class EmpleadoServeceImpl implements IEmpleadoService {
 
     @Override
     public void eliminar(Integer idEmpleado) {
-        iEmpleadoRepository.deleteById(idEmpleado);
+        Optional<Empleado> empleadolist = iEmpleadoRepository.findByIdEmpleado(idEmpleado);
+        if (empleadolist.isPresent()){
+            iEmpleadoRepository.deleteById(idEmpleado);
+        }else {
+            throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "No! hay registro de este empleado" +
+                    " en la base de datos" );
+        }
+
     }
 
     @Override
     public void actualizar(Empleado empleado) {
-        iEmpleadoRepository.save(empleado);
+        List<Empleado> empleadoList = iEmpleadoRepository.findAll();
+        if (empleadoList.isEmpty()){
+            iEmpleadoRepository.save(empleado);
+        }else{
+            throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "No! hay registro de este empleado" +
+                    " en la base de datos" );
+        }
+
     }
 
 
