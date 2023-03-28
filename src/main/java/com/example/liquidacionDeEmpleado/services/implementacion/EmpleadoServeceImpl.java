@@ -55,13 +55,11 @@ public class EmpleadoServeceImpl implements IEmpleadoService {
     @Override
     public void eliminar(Integer idEmpleado) {
         iEmpleadoRepository.deleteById(idEmpleado);
-
-
     }
 
     @Override
     public void actualizar(Empleado empleado) {
-
+        iEmpleadoRepository.save(empleado);
     }
 
 
